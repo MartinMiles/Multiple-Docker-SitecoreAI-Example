@@ -1,0 +1,56 @@
+{
+    "$schema": "../../.sitecore/schemas/ModuleFile.schema.json",
+    "namespace": "xmc-two-site",
+    "items": {
+        "path": "xmc-two-site",
+        "includes": [
+            {
+                "name": "site-collection",
+                "path": "/sitecore/content/Sites",
+                "scope": "singleItem",
+                "allowedPushOperations": "CreateAndUpdate"
+            },
+            {
+                "name": "site-root",
+                "path": "/sitecore/content/Sites/xmc-two",
+                "scope": "singleItem",
+                "allowedPushOperations": "CreateAndUpdate"
+            },
+            {
+                "name": "site-settings",
+                "path": "/sitecore/content/Sites/xmc-two/Settings",
+                "allowedPushOperations": "CreateAndUpdate"
+            },
+            {
+                "name": "site-media",
+                "path": "/sitecore/content/Sites/xmc-two/Media",
+                "scope": "itemAndDescendants",
+                "allowedPushOperations": "CreateAndUpdate"
+            },
+            {
+                "name": "site-data",
+                "path": "/sitecore/content/Sites/xmc-two/Data",
+                "scope": "itemAndDescendants",
+                "allowedPushOperations": "CreateAndUpdate"
+            },
+            {
+                "name": "site-dictionary",
+                "path": "/sitecore/content/Sites/xmc-two/Dictionary",
+                "scope": "itemAndDescendants",
+                "allowedPushOperations": "CreateAndUpdate"
+            },
+            {
+                "name": "site-home",
+                "path": "/sitecore/content/Sites/xmc-two/Home",
+                "scope": "itemAndDescendants",
+                "allowedPushOperations": "CreateAndUpdate"
+            },
+            {
+                "name": "site-presentation",
+                "path": "/sitecore/content/Sites/xmc-two/Presentation",
+                "scope": "itemAndDescendants",
+                "allowedPushOperations": "CreateAndUpdate"
+            }
+        ]
+    }
+}

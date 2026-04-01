@@ -1,0 +1,29 @@
+services:
+  traefik:
+    isolation: hyperv
+    image: traefik:v3.6.4-windowsservercore-ltsc2022
+    command:
+      - "--ping"
+      - "--api.insecure=true"
+      - "--providers.docker.endpoint=npipe:////./pipe/docker_engine"
+      - "--providers.docker.exposedByDefault=false"
+      - "--providers.file.directory=C:/etc/traefik/config/dynamic"
+      - "--entryPoints.websecure.address=:443"
+      - "--entryPoints.websecure.forwardedHeaders.insecure"
+    ports:
+      - "443:443"
+      - "8079:8080"
+    healthcheck:
+      test: ["CMD", "traefik", "healthcheck", "--ping"]
+    volumes:
+      - source: \\.\pipe\docker_engine\
+        target: \\.\pipe\docker_engine\
+        type: npipe
+      - ./traefik:C:/etc/traefik
+    networks:
+      - traefik-shared
+
+networks:
+  traefik-shared:
+    name: traefik-shared
+    external: true

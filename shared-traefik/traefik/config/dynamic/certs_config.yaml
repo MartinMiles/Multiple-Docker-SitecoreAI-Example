@@ -1,0 +1,10 @@
+tls:
+  certificates:
+    - certFile: C:\etc\traefik\certs\_wildcard.xmcloudcm.localhost.pem
+      keyFile: C:\etc\traefik\certs\_wildcard.xmcloudcm.localhost-key.pem
+    - certFile: C:\etc\traefik\certs\_wildcard.xmc-one.localhost.pem
+      keyFile: C:\etc\traefik\certs\_wildcard.xmc-one.localhost-key.pem
+    - certFile: C:\etc\traefik\certs\_wildcard.xmc-two.localhost.pem
+      keyFile: C:\etc\traefik\certs\_wildcard.xmc-two.localhost-key.pem
+    - certFile: C:\etc\traefik\certs\_wildcard.xmc-three.localhost.pem
+      keyFile: C:\etc\traefik\certs\_wildcard.xmc-three.localhost-key.pem

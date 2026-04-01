@@ -1,0 +1,27 @@
+# Multi-instance override: disables local Traefik, connects CM and rendering
+# to the shared Traefik network for centralized ingress routing.
+services:
+  traefik:
+    deploy:
+      replicas: 0
+
+  cm:
+    labels:
+      - "traefik.docker.network=traefik-shared"
+    networks:
+      - default
+      - traefik-shared
+
+  rendering-nextjs:
+    environment:
+      NEXT_PUBLIC_DEFAULT_SITE_NAME: ${SITE_NAME:-xmc-three}
+    labels:
+      - "traefik.docker.network=traefik-shared"
+    networks:
+      - default
+      - traefik-shared
+
+networks:
+  traefik-shared:
+    name: traefik-shared
+    external: true
