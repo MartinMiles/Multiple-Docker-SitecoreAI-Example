@@ -69,22 +69,20 @@ if ($LASTEXITCODE -ne 0) {
 Write-Host "Starting Sitecore environment..." -ForegroundColor Green
 docker compose up -d
 
-# Wait for Traefik to expose CM route
+# Wait for Traefik to expose CM route (CM needs time for DB init on first run)
 Write-Host "Waiting for CM to become available..." -ForegroundColor Green
 $startTime = Get-Date
+$timeoutSeconds = 300
 do {
-    Start-Sleep -Milliseconds 100
+    Start-Sleep -Seconds 2
     try {
-        $status = Invoke-RestMethod "http://localhost:8079/api/http/routers/$composeProjectName-cm-secure@docker"
+        $status = Invoke-RestMethod "http://localhost:8079/api/http/routers/$composeProjectName-cm-secure@docker" -ErrorAction SilentlyContinue
     } catch {
-        if ($_.Exception.Response.StatusCode.value__ -ne "404") {
-            throw
-        }
+        $status = $null
     }
-} while ($status.status -ne "enabled" -and $startTime.AddSeconds(15) -gt (Get-Date))
-if (-not $status.status -eq "enabled") {
-    $status
-    Write-Error "Timeout waiting for Sitecore CM to become available via Traefik proxy. Check CM container logs."
+} while (($null -eq $status -or $status.status -ne "enabled") -and $startTime.AddSeconds($timeoutSeconds) -gt (Get-Date))
+if ($null -eq $status -or $status.status -ne "enabled") {
+    Write-Error "Timeout waiting for Sitecore CM to become available via Traefik proxy after $timeoutSeconds seconds. Check CM container logs."
 }
 
 # Return to the original directory
