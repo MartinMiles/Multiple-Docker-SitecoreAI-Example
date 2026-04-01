@@ -164,63 +164,34 @@ if (-not $traefikReady) {
 }
 
 ###############################################
-# 4. Build and start each codebase
+# 4. Run up.ps1 for each codebase
+#    up.ps1 handles: build, start, CLI login,
+#    index rebuild, ser push (sites + content),
+#    and API key registration
 ###############################################
 
 foreach ($inst in $instances) {
-    $containerDir = Join-Path $RootDir "$($inst.Codebase)\local-containers"
+    $upScript = Join-Path $RootDir "$($inst.Codebase)\local-containers\scripts\up.ps1"
 
     Write-Host ""
     Write-Host "--- Starting $($inst.Codebase) ($($inst.ProjectName)) ---" -ForegroundColor Cyan
 
-    Push-Location $containerDir
-
-    Write-Host "  Building containers..." -ForegroundColor Green
-    docker compose build
-    if ($LASTEXITCODE -ne 0) {
-        Write-Error "Container build failed for $($inst.Codebase)."
-    }
-
-    Write-Host "  Starting containers..." -ForegroundColor Green
-    docker compose up -d
-    if ($LASTEXITCODE -ne 0) {
-        Write-Error "Container start failed for $($inst.Codebase)."
-    }
-
-    Pop-Location
-}
-
-###############################################
-# 5. Wait for CM instances
-###############################################
-
-Write-Host ""
-Write-Host "Waiting for CM instances to become available via Traefik..." -ForegroundColor Green
-
-foreach ($inst in $instances) {
-    $routerName = "$($inst.ProjectName)-cm-secure"
-    Write-Host "  Checking $($inst.Codebase) ($($inst.CmHost))..." -ForegroundColor White
-    $startTime = Get-Date
-    $isReady = $false
-    do {
-        Start-Sleep -Milliseconds 500
-        try {
-            $status = Invoke-RestMethod "http://localhost:8079/api/http/routers/${routerName}@docker" -ErrorAction SilentlyContinue
-            if ($status.status -eq "enabled") {
-                $isReady = $true
-            }
-        } catch { }
-    } while (-not $isReady -and $startTime.AddSeconds(120) -gt (Get-Date))
-
-    if ($isReady) {
-        Write-Host "  [OK] $($inst.CmHost) is available." -ForegroundColor Green
+    if (Test-Path $upScript) {
+        Push-Location (Join-Path $RootDir $inst.Codebase)
+        & $upScript
+        Pop-Location
     } else {
-        Write-Warning "  [TIMEOUT] $($inst.CmHost) did not become available within 120 seconds."
+        Write-Warning "up.ps1 not found for $($inst.Codebase), falling back to docker compose up"
+        $containerDir = Join-Path $RootDir "$($inst.Codebase)\local-containers"
+        Push-Location $containerDir
+        docker compose build
+        docker compose up -d
+        Pop-Location
     }
 }
 
 ###############################################
-# 6. Summary
+# 5. Summary
 ###############################################
 
 Write-Host ""
